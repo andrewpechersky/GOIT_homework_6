@@ -1,3 +1,4 @@
+import os
 import sys
 import scan
 import shutil
@@ -14,13 +15,9 @@ def handle_file(path, root_folder, dist):
 def handle_archive(path, root_folder, dist):
     target_folder = root_folder / dist
     target_folder.mkdir(exist_ok=True)
-    new_name = ""
-    if path.name.endswith(".zip"):
-        new_name = normalize.normalize(path.name.replace(".zip", ''))
-    elif path.name.endswith(".tar"):
-        new_name = normalize.normalize(path.name.replace(".tar", ''))
-    elif path.name.endswith(".tar.gz"):
-        new_name = normalize.normalize(path.name.replace(".tar.gz", ''))
+    new_name = path.name
+    for i in ['.zip', '.tar.gz', '.tar']:
+        new_name = normalize.normalize(new_name.replace(i, ''))
 
     archive_folder = target_folder / new_name
     archive_folder.mkdir(exist_ok=True)
@@ -29,6 +26,7 @@ def handle_archive(path, root_folder, dist):
         shutil.unpack_archive(str(path.resolve()), str(archive_folder.resolve()))
     except shutil.ReadError:
         archive_folder.rmdir()
+        os.remove(str(path.resolve()))
         return
     except FileNotFoundError:
         archive_folder.rmdir()
@@ -50,23 +48,18 @@ def main(folder_path):
     print(folder_path)
     scan.scan(folder_path)
 
-    for file in scan.image_files:
-        handle_file(file, folder_path, "IMAGES")
+    items = {'images': scan.image_files,
+             'video': scan.video_files,
+             'audio': scan.music_files,
+             'documents': scan.document_files,
+             'other': scan.others}
 
-    for file in scan.document_files:
-        handle_file(file, folder_path, "DOCUMENTS")
-
-    for file in scan.video_files:
-        handle_file(file, folder_path, "VIDEOS")
-
-    for file in scan.music_files:
-        handle_file(file, folder_path, "MUSIC")
-
-    for file in scan.others:
-        handle_file(file, folder_path, "OTHER")
+    for key, val in items.items():
+        for file in items[key]:
+            handle_file(file, folder_path, key)
 
     for file in scan.archives:
-        handle_archive(file, folder_path, "ARCHIVES")
+        handle_archive(file, folder_path, "archives")
 
     remove_empty_folders(folder_path)
 
