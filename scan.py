@@ -53,7 +53,7 @@ def get_extensions(file_name):
 def scan(folder):
     for item in folder.iterdir():
         if item.is_dir():
-            if item.name not in ('IMAGES', 'VIDEOS', 'MUSIC', 'DOCUMENTS', 'ARCHIVES', 'OTHER'):
+            if item.name not in ('images', 'video', 'audio', 'documents', 'archives', 'other'):
                 folders.append(item)
                 scan(item)
             continue
@@ -80,11 +80,11 @@ if __name__ == '__main__':
 
     scan(folder)
 
-    print(f"IMAGES: {image_files}")
-    print(f"VIDEOS: {video_files}")
-    print(f"MUSIC: {music_files}")
-    print(f"DOCUMENTS: {document_files}")
-    print(f"ARCHIVES: {archives}")
+    print(f"images: {image_files}")
+    print(f"videos: {video_files}")
+    print(f"music: {music_files}")
+    print(f"documents: {document_files}")
+    print(f"archives: {archives}")
     print(f"unknown: {others}")
     print(f"All extensions: {extensions}")
     print(f"Unknown extensions: {unknown}")
