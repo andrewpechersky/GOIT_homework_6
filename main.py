@@ -64,9 +64,18 @@ def main(folder_path):
     remove_empty_folders(folder_path)
 
 
+def print_result(folder):
+    for item in folder.iterdir():
+        print(item.name)
+        if item.is_dir():
+            print_result(item)
+        continue
+
+
 if __name__ == '__main__':
     path = sys.argv[1]
     print(f'Start in {path}')
 
     folder = Path(path)
     main(folder.resolve())
+    print_result(folder.resolve())
